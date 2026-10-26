@@ -1,4 +1,3 @@
-
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -9,6 +8,20 @@ import { RouterLink } from '@angular/router';
   templateUrl: './dashboard-topbar.html'
 })
 export class DashboardTopbar {
-  @Input() role: 'Admin' | 'Agent' | 'Customer' = 'Customer';
-  @Input() homeUrl = '/customer/dashboard';
+
+  @Input()
+  role: 'Admin' | 'Agent' | 'Customer' = 'Customer';
+
+  @Input()
+  homeUrl = '/customer/dashboard';
+
+  showNotifications = false;
+
+  toggleNotifications(): void {
+    this.showNotifications = !this.showNotifications;
+  }
+
+  closeNotifications(): void {
+    this.showNotifications = false;
+  }
 }

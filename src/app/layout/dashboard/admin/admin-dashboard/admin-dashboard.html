@@ -1,49 +1,201 @@
+<section class="dash-shell">
 
-<div class="mb-4">
-  <h2 class="fw-bold mb-1">Admin Dashboard</h2>
-  <p class="text-muted">
-    Manage insurance operations from one place.
-  </p>
-</div>
+  <header class="dash-header">
 
-<div class="alert alert-primary border-0">
-  <i class="bi bi-info-circle me-2"></i>
-  Dashboard summary metrics will appear after backend API integration.
-</div>
-
-<div class="row g-4">
-
-  @for (card of cards; track card.title) {
-
-    <div class="col-12 col-md-6 col-xl-4">
-
-      <div class="card border-0 shadow-sm h-100">
-
-        <div class="card-body p-4">
-
-          <div class="d-flex align-items-center gap-3 mb-3">
-
-            <div class="bg-primary bg-opacity-10 rounded p-3">
-              <i class="bi fs-4 text-primary"
-                 [class]="card.icon"></i>
-            </div>
-
-            <h5 class="fw-semibold mb-0">
-              {{ card.title }}
-            </h5>
-
-          </div>
-
-          <p class="text-muted mb-0">
-            {{ card.description }}
-          </p>
-
-        </div>
-
+    <div>
+      <div class="eyebrow">
+        INSURANCE POLICY ADMINISTRATION
       </div>
 
+      <h2>Admin overview</h2>
+
+      <p>
+        Operational snapshot • Business-wide performance
+      </p>
+    </div>
+
+    <div class="dash-actions">
+
+      @if (dashboard) {
+        <span class="demo-badge">
+          {{ dashboard.demo ? '● Demo data' : '● Live data' }}
+        </span>
+      }
+
+      <button
+        type="button"
+        class="refresh-btn"
+        (click)="refresh()"
+        [disabled]="loading">
+
+        ↻ {{ loading ? 'Refreshing...' : 'Refresh' }}
+
+      </button>
+
+    </div>
+
+  </header>
+
+  @if (errorMessage) {
+
+    <div class="alert alert-danger">
+      {{ errorMessage }}
     </div>
 
   }
 
-</div>
+  <div class="filters">
+
+    <label>
+
+      Module
+
+      <select
+        [value]="selectedModule"
+        (change)="onModuleChange($event)">
+
+        <option value="all">
+          All modules
+        </option>
+
+        @for (card of cards; track card.module) {
+
+          <option [value]="card.module">
+            {{ card.title }}
+          </option>
+
+        }
+
+      </select>
+
+    </label>
+
+    <label>
+
+      Status
+
+      <select
+        [value]="selectedStatus"
+        (change)="onStatusChange($event)">
+
+        <option value="all">
+          All statuses
+        </option>
+
+        @for (status of statuses; track status) {
+
+          <option [value]="status">
+            {{ status }}
+          </option>
+
+        }
+
+      </select>
+
+    </label>
+
+    <div class="updated">
+
+      @if (dashboard?.generatedAt) {
+
+        Updated
+        {{ dashboard?.generatedAt | date:'medium' }}
+
+      }
+
+    </div>
+
+  </div>
+
+  @if (loading && !dashboard) {
+
+    <div class="alert alert-info">
+      Loading dashboard...
+    </div>
+
+  }
+
+  <div class="metrics">
+
+    @for (card of visibleCards; track card.module) {
+
+      <article class="metric-card">
+
+        <div class="metric-top">
+
+          <span>{{ card.title }}</span>
+
+          <i class="bi" [class]="card.icon"></i>
+
+        </div>
+
+        <div class="metric-number">
+          {{ statusCount(card.module) ?? '—' }}
+        </div>
+
+        <div class="metric-foot">
+
+          @if (unavailable(card.module)) {
+
+            Service unavailable
+
+          } @else {
+
+            {{
+              selectedStatus === 'all'
+                ? 'Total records'
+                : selectedStatus.replaceAll('_', ' ')
+            }}
+
+          }
+
+        </div>
+
+      </article>
+
+    }
+
+  </div>
+
+  <div class="insights-header">
+
+    <div>
+
+      <h4>Performance analytics</h4>
+
+      <p>
+        Status breakdown from dashboard API
+      </p>
+
+    </div>
+
+    <span class="insights-total">
+      {{ totalVisible }} selected records
+    </span>
+
+  </div>
+
+  <div class="chart-grid">
+
+    @for (card of visibleCards; track card.module) {
+
+      <app-status-chart
+        [title]="card.title + ' status'"
+        [summary]="module(card.module)"
+        [unavailable]="unavailable(card.module)">
+      </app-status-chart>
+
+    }
+
+  </div>
+
+  @if (dashboard?.demo) {
+
+    <p class="disclaimer">
+      Demo values are illustrative and do not represent
+      live policyholder or payment records.
+    </p>
+
+  }
+
+</section>

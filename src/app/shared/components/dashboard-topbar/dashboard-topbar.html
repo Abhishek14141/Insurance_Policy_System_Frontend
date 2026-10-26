@@ -1,32 +1,135 @@
-
 <header class="navbar navbar-light bg-white border-bottom px-3 py-3 shadow-sm">
 
   <div class="d-flex align-items-center gap-2">
+
     <i class="bi bi-shield-check text-primary fs-4"></i>
 
     <div>
-      <h5 class="mb-0 fw-bold">Insurance Policy System</h5>
-      <small class="text-muted">{{ role }} Portal</small>
+
+      <h5 class="mb-0 fw-bold">
+        Insurance Policy System
+      </h5>
+
+      <small class="text-muted">
+        {{ role }} Portal
+      </small>
+
     </div>
+
   </div>
 
   <div class="d-flex align-items-center gap-3">
 
-    <a [routerLink]="homeUrl"
-       class="text-decoration-none text-secondary"
-       title="Dashboard">
+    <a
+      [routerLink]="homeUrl"
+      class="text-decoration-none text-secondary"
+      title="Dashboard">
+
       <i class="bi bi-house-door fs-5"></i>
+
     </a>
 
-    <button type="button"
-            class="btn btn-light position-relative"
-            title="Notifications">
-      <i class="bi bi-bell fs-5"></i>
-    </button>
+    <div class="position-relative">
+
+      <button
+        type="button"
+        class="btn btn-light position-relative"
+        title="Email Notifications"
+        aria-label="Email Notifications"
+        aria-controls="emailNotificationInfo"
+        [attr.aria-expanded]="showNotifications"
+        (click)="toggleNotifications()">
+
+        <i class="bi bi-bell fs-5"></i>
+
+      </button>
+
+      @if (showNotifications) {
+
+        <div
+          id="emailNotificationInfo"
+          class="card border-0 shadow position-absolute end-0 mt-2"
+          style="width: 290px; z-index: 1050;">
+
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+            <span class="fw-semibold">
+
+              <i class="bi bi-envelope me-2 text-primary"></i>
+
+              Email Notifications
+
+            </span>
+
+            <button
+              type="button"
+              class="btn-close"
+              aria-label="Close"
+              (click)="closeNotifications()">
+            </button>
+
+          </div>
+
+          <div class="card-body">
+
+            <p class="small text-muted mb-3">
+              Important insurance updates are sent to your
+              registered email address.
+            </p>
+
+            <div class="d-flex align-items-center gap-2 mb-2">
+
+              <i class="bi bi-shield-check text-primary"></i>
+
+              <span class="small">
+                Policy updates
+              </span>
+
+            </div>
+
+            <div class="d-flex align-items-center gap-2 mb-2">
+
+              <i class="bi bi-credit-card text-primary"></i>
+
+              <span class="small">
+                Premium payment reminders
+              </span>
+
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+
+              <i class="bi bi-clipboard-check text-primary"></i>
+
+              <span class="small">
+                Claim updates
+              </span>
+
+            </div>
+
+            <hr>
+
+            <p class="small text-muted mb-0">
+              Please check your registered email inbox
+              for notification details.
+            </p>
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
 
     <div class="d-flex align-items-center gap-2">
+
       <i class="bi bi-person-circle fs-4 text-primary"></i>
-      <span class="fw-semibold">{{ role }}</span>
+
+      <span class="fw-semibold">
+        {{ role }}
+      </span>
+
     </div>
 
   </div>

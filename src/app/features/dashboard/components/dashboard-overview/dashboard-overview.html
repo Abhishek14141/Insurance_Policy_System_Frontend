@@ -1,0 +1,458 @@
+<div class="dashboard-page">
+
+  <!-- HEADER -->
+
+  <div class="dashboard-header">
+
+    <div class="header-content">
+
+      <div class="header-label">
+        <span class="label-dot"></span>
+        INSURANCE POLICY ADMINISTRATION
+      </div>
+
+      <h1>{{ pageTitle }}</h1>
+
+      <p>{{ pageDescription }}</p>
+
+    </div>
+
+    <div class="header-actions">
+
+      @if (lastUpdated) {
+
+        <div class="last-updated">
+
+          <i class="bi bi-clock-history"></i>
+
+          <span>
+            Updated {{ lastUpdated | date:'mediumTime' }}
+          </span>
+
+        </div>
+
+      }
+
+      <button
+        type="button"
+        class="refresh-button"
+        (click)="refresh()"
+        [disabled]="loading">
+
+        <i
+          class="bi bi-arrow-clockwise"
+          [class.spinning]="loading">
+        </i>
+
+        {{ loading ? 'Refreshing...' : 'Refresh' }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- FEEDBACK -->
+
+  @if (errorMessage) {
+
+    <div class="feedback error-feedback">
+
+      <i class="bi bi-exclamation-circle"></i>
+
+      {{ errorMessage }}
+
+    </div>
+
+  }
+
+  @if (successMessage && !loading) {
+
+    <div class="feedback success-feedback">
+
+      <i class="bi bi-check-circle"></i>
+
+      {{ successMessage }}
+
+    </div>
+
+  }
+
+  <!-- FILTERS -->
+
+  <div class="filter-panel">
+
+    <div class="filter-title">
+
+      <i class="bi bi-sliders"></i>
+
+      <span>Dashboard Filters</span>
+
+    </div>
+
+    <div class="filter-controls">
+
+      <div class="filter-field">
+
+        <label for="moduleFilter">
+          Module
+        </label>
+
+        <select
+          id="moduleFilter"
+          [value]="selectedModule"
+          (change)="onModuleChange($event)">
+
+          <option value="all">
+            All Modules
+          </option>
+
+          @for (card of cards; track card.key) {
+
+            <option [value]="card.key">
+              {{ card.title }}
+            </option>
+
+          }
+
+        </select>
+
+      </div>
+
+      <div class="filter-field">
+
+        <label for="statusFilter">
+          Status
+        </label>
+
+        <select
+          id="statusFilter"
+          [value]="selectedStatus"
+          (change)="onStatusChange($event)">
+
+          <option value="all">
+            All Statuses
+          </option>
+
+          @for (status of availableStatuses; track status) {
+
+            <option [value]="status">
+              {{ formatStatus(status) }}
+            </option>
+
+          }
+
+        </select>
+
+      </div>
+
+      <div class="filter-summary">
+
+        <span class="summary-label">
+          Selected Records
+        </span>
+
+        <strong>{{ totalRecords }}</strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- LOADING -->
+
+  @if (loading && !dashboard) {
+
+    <div class="loading-panel">
+
+      <div class="loading-spinner"></div>
+
+      <p>Loading dashboard analytics...</p>
+
+    </div>
+
+  }
+
+  <!-- DASHBOARD CONTENT -->
+
+  @if (dashboard) {
+
+    <!-- KPI CARDS -->
+
+    <div class="section-heading">
+
+      <div>
+
+        <h2>Overview</h2>
+
+        <p>
+          Key performance indicators
+        </p>
+
+      </div>
+
+      <span class="section-pill">
+        {{ visibleCards.length }} Modules
+      </span>
+
+    </div>
+
+    <div class="kpi-grid">
+
+      @for (card of visibleCards; track card.key) {
+
+        <div
+          class="kpi-card"
+          [class.unavailable]="isUnavailable(card.key)">
+
+          <div class="kpi-top">
+
+            <div
+              class="kpi-icon"
+              [attr.data-color]="card.color">
+
+              <i class="bi" [ngClass]="card.icon"></i>
+
+            </div>
+
+            <span class="kpi-indicator">
+              <i class="bi bi-graph-up-arrow"></i>
+            </span>
+
+          </div>
+
+          <div class="kpi-value">
+
+            @if (isUnavailable(card.key)) {
+
+              <span>—</span>
+
+            } @else {
+
+              {{ getCount(card.key) }}
+
+            }
+
+          </div>
+
+          <div class="kpi-title">
+            {{ card.title }}
+          </div>
+
+          <div class="kpi-footer">
+
+            @if (isUnavailable(card.key)) {
+
+              <span class="unavailable-text">
+                Service unavailable
+              </span>
+
+            } @else if (selectedStatus !== 'all') {
+
+              <span>
+                {{ formatStatus(selectedStatus) }} records
+              </span>
+
+            } @else {
+
+              <span>
+                Total records
+              </span>
+
+            }
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+    <!-- SUMMARY -->
+
+    <div class="summary-grid">
+
+      <div class="summary-card">
+
+        <div class="summary-icon blue">
+
+          <i class="bi bi-collection"></i>
+
+        </div>
+
+        <div>
+
+          <span>Selected Records</span>
+
+          <strong>{{ totalRecords }}</strong>
+
+        </div>
+
+      </div>
+
+      <div class="summary-card">
+
+        <div class="summary-icon green">
+
+          <i class="bi bi-check-circle"></i>
+
+        </div>
+
+        <div>
+
+          <span>Positive Statuses</span>
+
+          <strong>{{ activeRecords }}</strong>
+
+        </div>
+
+      </div>
+
+      <div class="summary-card">
+
+        <div class="summary-icon orange">
+
+          <i class="bi bi-hourglass-split"></i>
+
+        </div>
+
+        <div>
+
+          <span>Pending / Due</span>
+
+          <strong>{{ pendingRecords }}</strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- INTERACTIVE CHARTS -->
+
+    <div class="section-heading analytics-heading">
+
+      <div>
+
+        <h2>Analytics & Insights</h2>
+
+        <p>
+          Interactive status distribution charts
+        </p>
+
+      </div>
+
+      <span class="section-pill">
+        <i class="bi bi-pie-chart"></i>
+        Status Analytics
+      </span>
+
+    </div>
+
+    <div class="analytics-grid">
+
+      @for (chart of charts; track chart.key) {
+
+        <div class="chart-card">
+
+          <div class="chart-header">
+
+            <div>
+
+              <h3>{{ chart.title }}</h3>
+
+              <p>Status distribution</p>
+
+            </div>
+
+            <div class="chart-header-icon">
+
+              <i class="bi bi-pie-chart-fill"></i>
+
+            </div>
+
+          </div>
+
+          @if (chart.unavailable) {
+
+            <div class="chart-empty">
+
+              <i class="bi bi-exclamation-triangle"></i>
+
+              <span>Service unavailable</span>
+
+            </div>
+
+          } @else if (chart.total === 0) {
+
+            <div class="chart-empty">
+
+              <i class="bi bi-bar-chart"></i>
+
+              <span>No records available</span>
+
+            </div>
+
+          } @else {
+
+            <div class="chart-content">
+
+              <div class="donut-container">
+
+                <app-interactive-chart
+                  [summary]="getModule(chart.key)">
+                </app-interactive-chart>
+
+              </div>
+
+              <div class="chart-legend">
+
+                @for (
+                  segment of chart.segments;
+                  track segment.label
+                ) {
+
+                  <div class="legend-row">
+
+                    <div class="legend-name">
+
+                      <span
+                        class="legend-dot"
+                        [style.background]="segment.color">
+                      </span>
+
+                      <span>{{ segment.label }}</span>
+
+                    </div>
+
+                    <div class="legend-value">
+
+                      <strong>{{ segment.value }}</strong>
+
+                      <small>
+                        {{ segment.percentage | number:'1.0-1' }}%
+                      </small>
+
+                    </div>
+
+                  </div>
+
+                }
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+      }
+
+    </div>
+
+  }
+
+</div>
