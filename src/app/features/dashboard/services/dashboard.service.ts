@@ -15,7 +15,7 @@ export class DashboardService {
   private readonly http = inject(HttpClient);
 
   private readonly baseUrl =
-    'http://localhost:8085/api/v1/dashboard';
+    'https://salt-aggregate-spelling-atomic.trycloudflare.com/api/v1/dashboard';
 
   getAdminDashboard(): Observable<ApiResponse<DashboardResponse>> {
 
