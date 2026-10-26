@@ -1,0 +1,205 @@
+<section class="dash-shell">
+
+  <header class="dash-header">
+
+    <div>
+
+      <div class="eyebrow">
+        INSURANCE POLICY ADMINISTRATION
+      </div>
+
+      <h2>Agent overview</h2>
+
+      <p>
+        Operational snapshot • Your business performance
+      </p>
+
+    </div>
+
+    <div class="dash-actions">
+
+      @if (dashboard) {
+
+        <span class="demo-badge">
+          {{ dashboard.demo ? '● Demo data' : '● Live data' }}
+        </span>
+
+      }
+
+      <button
+        type="button"
+        class="refresh-btn"
+        (click)="refresh()"
+        [disabled]="loading">
+
+        ↻ {{ loading ? 'Refreshing...' : 'Refresh' }}
+
+      </button>
+
+    </div>
+
+  </header>
+
+  @if (errorMessage) {
+
+    <div class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+  }
+
+  <div class="filters">
+
+    <label>
+
+      Module
+
+      <select
+        [value]="selectedModule"
+        (change)="onModuleChange($event)">
+
+        <option value="all">
+          All modules
+        </option>
+
+        @for (card of cards; track card.module) {
+
+          <option [value]="card.module">
+            {{ card.title }}
+          </option>
+
+        }
+
+      </select>
+
+    </label>
+
+    <label>
+
+      Status
+
+      <select
+        [value]="selectedStatus"
+        (change)="onStatusChange($event)">
+
+        <option value="all">
+          All statuses
+        </option>
+
+        @for (status of statuses; track status) {
+
+          <option [value]="status">
+            {{ status }}
+          </option>
+
+        }
+
+      </select>
+
+    </label>
+
+    <div class="updated">
+
+      @if (dashboard?.generatedAt) {
+
+        Updated
+        {{ dashboard?.generatedAt | date:'medium' }}
+
+      }
+
+    </div>
+
+  </div>
+
+  @if (loading && !dashboard) {
+
+    <div class="alert alert-info">
+      Loading dashboard...
+    </div>
+
+  }
+
+  <div class="metrics">
+
+    @for (card of visibleCards; track card.module) {
+
+      <article class="metric-card">
+
+        <div class="metric-top">
+
+          <span>{{ card.title }}</span>
+
+          <i class="bi" [class]="card.icon"></i>
+
+        </div>
+
+        <div class="metric-number">
+          {{ statusCount(card.module) ?? '—' }}
+        </div>
+
+        <div class="metric-foot">
+
+          @if (unavailable(card.module)) {
+
+            Service unavailable
+
+          } @else {
+
+            {{
+              selectedStatus === 'all'
+                ? 'Total records'
+                : selectedStatus.replaceAll('_', ' ')
+            }}
+
+          }
+
+        </div>
+
+      </article>
+
+    }
+
+  </div>
+
+  <div class="insights-header">
+
+    <div>
+
+      <h4>Performance analytics</h4>
+
+      <p>
+        Status breakdown from dashboard API
+      </p>
+
+    </div>
+
+    <span class="insights-total">
+      {{ totalVisible }} selected records
+    </span>
+
+  </div>
+
+  <div class="chart-grid">
+
+    @for (card of visibleCards; track card.module) {
+
+      <app-status-chart
+        [title]="card.title + ' status'"
+        [summary]="module(card.module)"
+        [unavailable]="unavailable(card.module)">
+      </app-status-chart>
+
+    }
+
+  </div>
+
+  @if (dashboard?.demo) {
+
+    <p class="disclaimer">
+      Demo values are illustrative and do not represent
+      live customer, policy or commission records.
+    </p>
+
+  }
+
+</section>
